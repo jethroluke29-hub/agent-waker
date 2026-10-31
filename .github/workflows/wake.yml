@@ -1,0 +1,25 @@
+name: Wake agent
+on:
+  workflow_dispatch:
+jobs:
+  wake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ secrets.CS_TOKEN }}
+      CS: ${{ secrets.CS_NAME }}
+    steps:
+      - name: Start codespace
+        run: gh api -X POST "/user/codespaces/$CS/start" --silent || echo "start call returned non-zero (may already be running)"
+      - name: Wait until available
+        run: |
+          for i in $(seq 1 40); do
+            s=$(gh api "/user/codespaces/$CS" --jq .state)
+            echo "state: $s"
+            if [ "$s" = "Available" ]; then exit 0; fi
+            sleep 15
+          done
+          exit 1
+      - name: Start gateway if needed
+        run: |
+          gh codespace ssh -c "$CS" -- -o StrictHostKeyChecking=no "pgrep -f '[g]ateway run' >/dev/null || tmux new-session -d -s gw '/home/codespace/.local/bin/hermes gateway run'; sleep 5; pgrep -fa '[g]ateway run' || echo GATEWAY-NOT-RUNNING"
