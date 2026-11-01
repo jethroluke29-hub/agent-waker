@@ -20,6 +20,7 @@ jobs:
             sleep 15
           done
           exit 1
-            - name: Start gateway if needed
+      - name: Start gateway if needed
         run: |
+          sleep 20
           gh codespace ssh -c "$CS" -- -o StrictHostKeyChecking=no "bash /workspaces/agent-box/wake.sh"
