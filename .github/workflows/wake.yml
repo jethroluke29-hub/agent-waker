@@ -20,6 +20,6 @@ jobs:
             sleep 15
           done
           exit 1
-      - name: Start gateway if needed
+            - name: Start gateway if needed
         run: |
-          gh codespace ssh -c "$CS" -- -o StrictHostKeyChecking=no "pgrep -f '[g]ateway run' >/dev/null || tmux new-session -d -s gw '/home/codespace/.local/bin/hermes gateway run'; sleep 5; pgrep -fa '[g]ateway run' || echo GATEWAY-NOT-RUNNING"
+          gh codespace ssh -c "$CS" -- -o StrictHostKeyChecking=no "bash /workspaces/agent-box/wake.sh"
